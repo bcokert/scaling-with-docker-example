@@ -1,0 +1,17 @@
+# Use an alpine linux distro (nice and small), that already has python as a base
+FROM python:2.7-alpine
+
+# Dependencies
+# Put any dependencies here, eg:
+# RUN apt-get install java
+
+# Server
+# change directory to the given location, running future commands in it
+WORKDIR /usr/local/lib
+# copy output_dir/simple-service folder to /usr/local/lib/simple-service
+COPY simple-service simple-service/
+# set an environment variable. We'll see another way to set these shortly
+ENV SIMPLE_SERVICE_PORT 8080
+# open port 8080 from container to dockerhost
+EXPOSE 8080
+
