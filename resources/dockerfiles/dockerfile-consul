@@ -1,0 +1,51 @@
+FROM alpine
+
+#RUN version=0.5.2 \
+#  && apk --update add make wget go git gcc musl-dev openssl-dev bash curl \
+#  && export GOPATH=/go \
+#  && go get -u -v github.com/hashicorp/consul \
+#  && cd /go/src/github.com/hashicorp/consul \
+#  && git checkout v${version} \
+#  && make \
+#  && mv bin/consul /bin/ \
+#  && rm -rf /go \
+#  && cd /tmp \
+#  && wget -O ui.zip https://releases.hashicorp.com/consul/${version}/consul_${version}_web_ui.zip \
+#  && unzip ui.zip \
+#  && mv dist /ui \
+#  && rm ui.zip \
+#  && apk del make wget go git gcc musl-dev openssl-dev bash curl \
+#  && rm -rf /var/cache/apk/* \
+#  && mkdir -p /var/log/consul /data
+
+ENV CONSUL_VERSION 0.5.2
+ENV CONSUL_SHA256 171cf4074bfca3b1e46112105738985783f19c47f4408377241b868affa9d445
+
+RUN apk --update add curl wget bash ca-certificates && \
+    curl -Ls https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64/glibc-2.21-r2.apk > /tmp/glibc-2.21-r2.apk && \
+    apk add --allow-untrusted /tmp/glibc-2.21-r2.apk && \
+    rm -rf /tmp/glibc-2.21-r2.apk /var/cache/apk/*
+ADD https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip /tmp/consul.zip
+RUN echo "${CONSUL_SHA256}  /tmp/consul.zip" > /tmp/consul.sha256 \
+  && sha256sum -c /tmp/consul.sha256 \
+  && cd /bin \
+  && unzip /tmp/consul.zip \
+  && chmod +x /bin/consul \
+  && rm /tmp/consul.zip \
+  && wget -O ui.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_web_ui.zip \
+  && unzip ui.zip \
+  && mv dist /ui \
+  && rm ui.zip \
+  && mkdir -p /var/log/consul /data
+
+ENV GOMAXPROCS 2
+
+COPY consul.d /etc/consul.d/
+
+COPY consul-server-start.sh /usr/local/bin
+RUN chmod a+x /usr/local/bin/consul-server-start.sh
+
+VOLUME /data/consul
+VOLUME /var/log/consul
+
+EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 8600 8600/udp

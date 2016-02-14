@@ -1,0 +1,9 @@
+{
+  "service": {
+    "name": "simple-service",
+    "tags": [
+      "simple-service"
+    ],
+    "port": 8080
+  }
+}

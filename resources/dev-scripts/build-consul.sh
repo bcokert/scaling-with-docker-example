@@ -4,14 +4,14 @@ SOURCE_DIR=${ROOT_DIR}/src
 RESOURCE_DIR=${ROOT_DIR}/resources
 DOCKERFILE_DIR=${RESOURCE_DIR}/dockerfiles
 ARTIFACT_DIR=${ROOT_DIR}/build
-OUTPUT_DIR=${ROOT_DIR}/release-server-tmp
+OUTPUT_DIR=${ROOT_DIR}/release-consul-tmp
 CONSUL_CONFIG_DIR=${RESOURCE_DIR}/consul.d
 CONSUL_SCRIPTS_DIR=${RESOURCE_DIR}/consul-scripts
 
 DOCKER_MACHINE_NAME=default
 REPOSITORY=${DOCKER_REPOSITORY}
-DOCKER_FILE_NAME=dockerfile-server
-IMAGE=simple-server
+DOCKER_FILE_NAME=dockerfile-consul
+IMAGE=simple-consul
 
 # Some nice red text for the terminal
 ERROR_TXT="\033[1m\033[41m\033[97mERROR:\033[0m"
@@ -28,10 +28,6 @@ fi
 echo "Cleaning any old release files..."
 rm -rf ${OUTPUT_DIR}
 mkdir ${OUTPUT_DIR}
-
-echo "Building project..."
-# Build your project here, if applicable
-cp -r ${SOURCE_DIR}/ ${OUTPUT_DIR}/simple-service # "Build" our toy service
 
 echo "Preparing build artifacts for docker imaging..."
 # Do any post-build setup here, like unzipping files
@@ -60,4 +56,3 @@ fi
 echo "Pushing docker images..."
 echo "If this fails saying it's already in progress, try 'docker-machine restart ${DOCKER_MACHINE_NAME}'"
 docker push ${REPOSITORY}/${IMAGE}
-

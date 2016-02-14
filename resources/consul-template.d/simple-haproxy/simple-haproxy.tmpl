@@ -1,0 +1,22 @@
+global
+    daemon
+    maxconn 10000
+    log localhost local0
+    log localhost local1 notice
+
+defaults
+    mode http
+    log global
+    option httplog
+    option dontlognull
+    timeout connect 5000ms
+    timeout client 30000ms
+    timeout server 30000ms
+
+frontend http-in
+    bind *:80
+    default_backend webservers
+
+backend webservers
+    {{range service "simple-service"}}
+    server {{.Node}} {{.Address}}:{{.Port}}{{end}}
